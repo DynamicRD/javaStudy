@@ -12,7 +12,6 @@ import java.util.Scanner;
 
 public class BooksMain {
 	public static Scanner scan = new Scanner(System.in);
-	
 
 	public static void main(String[] args) throws SQLException {
 		// 사용자로부터 출력,입력,수정,삭제,종료 요청받는다
@@ -33,8 +32,11 @@ public class BooksMain {
 			case BookMenu.DELETE:
 				booksDelete();
 				break;
-			case BookMenu.SALARY_UP:
-				employeeSalaryUp();
+			case BookMenu.SALARY_UP_PROC:
+				employeeSalaryUpProc();
+				break;
+			case BookMenu.SALARY_UP_FUNC:
+				employeeSalaryUpFunc();
 				break;
 			case BookMenu.EXIT:
 				exitFlag = true;
@@ -47,32 +49,55 @@ public class BooksMain {
 		System.out.println("The End");
 	}
 
-	//연봉인상 10%
-	private static void employeeSalaryUp() throws SQLException {
+	private static void employeeSalaryUpFunc() throws SQLException {
 		// Connection
 		Connection con = null;
-		PreparedStatement pstmt = null;
 		CallableStatement cstmt = null;
 
 		// 1.Load,2.connect
+		con = DBConnection.dbCon();
+		System.out.print("조회할 ID 입력: >>");
+		int id = Integer.parseInt(scan.nextLine());
+		// cstmt = con.prepareCall("{? = call BOOKS_FUNCTION(?)}");
+		cstmt = con.prepareCall("{? = call BOOKS_FUNCTION(?)}");
+		cstmt.registerOutParameter(1, Types.VARCHAR);
+		cstmt.setInt(2, id);
+		// 출력될 데이터 값으로 3번을 바인딩한다
+		int result = cstmt.executeUpdate();
+		String message = cstmt.getString(1);
+		System.out.println(message);
+		// 4.내용이 잘 입력되었는지 체크
+		System.out.println((result != 0) ? "FUNCTION 성공" : "FUNCTION 실패");
+		// 6.sql 객체 반납
+		DBConnection.dbClose(con, cstmt);
+	}
+
+	// 연봉인상 10%
+	private static void employeeSalaryUpProc() throws SQLException {
+		// Connection
+		Connection con = null;
+		CallableStatement cstmt = null;
+
+		// 1 Load,2 connect
 		con = DBConnection.dbCon();
 		System.out.print("인상될 ID 입력: >>");
 		int id = Integer.parseInt(scan.nextLine());
 		System.out.print("인상금액: >>");
 		int price = Integer.parseInt(scan.nextLine());
-		
-		//cstmt = con.prepareCall("{call EMP1_PROCEDURE(?,?)}");
-		cstmt = con.prepareCall("{call EMP1_PROCEDURE(?,?,?)}");
-		cstmt.setInt(1,id);
-		cstmt.setDouble(2,price);
-		//출력될 데이터 값으로 3번을 바인딩한다
+
+		// 3. cstmt = con.prepareCall("{call EMP1_PROCEDURE(?,?,?)}");
+		cstmt = con.prepareCall("{call BOOKS_PROCEDURE(?, ?, ?)}");
+		cstmt.setInt(1, id);
+		cstmt.setDouble(2, price);
+		// 출력될 데이터값으로 3번을 바인딩시킨다.
 		cstmt.registerOutParameter(3, Types.VARCHAR);
+
 		int result = cstmt.executeUpdate();
 		String message = cstmt.getString(3);
 		System.out.println(message);
-		// 4.내용이 잘 입력되었는지 체크
-		System.out.println((result != 0) ? "책값인상프로시저성공" : "책값인상프로시저실패");
-		// 6.sql 객체 반납
+		// 4.내용이 잘 입력이 되었는지 check
+		System.out.println((result != 0) ? "책값 인상 프로시저성공" : "책값 인상 프로시저실패");
+		// 6.sql 객체 반남
 		DBConnection.dbClose(con, cstmt);
 	}
 
@@ -104,9 +129,9 @@ public class BooksMain {
 		// 1.Load,2.connect
 		con = DBConnection.dbCon();
 		// 3.statement
-		//수정할 데이터를 입력
+		// 수정할 데이터를 입력
 		Books books = new Books(11, "java Java", "kdj", "2024", 33000);
-		
+
 		pstmt = con.prepareStatement("UPDATE BOOKS SET TITLE = ?, PUBLISHER = ? ,YEAR = ?,PRICE= ? WHERE ID = ?");
 		pstmt.setString(1, books.getTitle());
 		pstmt.setString(2, books.getPublisher());
@@ -124,26 +149,36 @@ public class BooksMain {
 	private static void booksInsert() throws SQLException {
 		// Connection
 		Connection con = null;
-		//Statement stmt = null;
+		// Statement stmt = null;
 		PreparedStatement pstmt = null;
 
 		// 1.Load,2.connect
 		con = DBConnection.dbCon();
+		//--트랜잭션 시작
+		con.setAutoCommit(false);
 		// 3.statement
 		Books books = new Books(0, "Head Java", "kdj", "2008", 23000);
-		//===================================================================
-		//stmt = con.createStatement();
+		// ===================================================================
+		// stmt = con.createStatement();
 		pstmt = con.prepareStatement("INSERT INTO books  VALUES (bookS_id_seq.nextval, ?, ?, ?,?)");
-		pstmt.setString(1,books.getTitle());
-		pstmt.setString(2,books.getPublisher());
-		pstmt.setString(3,books.getYear());
+		pstmt.setString(1, books.getTitle());
+		pstmt.setString(2, books.getPublisher());
+		pstmt.setString(3, books.getYear());
 		pstmt.setInt(4, books.getPrice());
-		
-		//int result = stmt.executeUpdate("INSERT INTO books  VALUES (bookS_id_seq.nextval,'" + books.getTitle() + "','"
-		//		+ books.getPublisher() + "','" + books.getYear() + "','" + books.getPrice() + "')");
+
+		// int result = stmt.executeUpdate("INSERT INTO books VALUES
+		// (bookS_id_seq.nextval,'" + books.getTitle() + "','"
+		// + books.getPublisher() + "','" + books.getYear() + "','" + books.getPrice() +
+		// "')");
 		int result2 = pstmt.executeUpdate();
 		// 4.내용이 잘 입력되었는지 체크
 		System.out.println((result2 != 0) ? "입력성공" : "입력실패");
+		
+		if(result2 != 0) {
+			con.commit();
+		}else {
+			con.rollback();
+		}
 		// 6.sql 객체 반납
 		DBConnection.dbClose(con, pstmt);
 	}
@@ -178,10 +213,10 @@ public class BooksMain {
 	}
 
 	private static void printMenu() {
-		System.out.println("Books Menu(1.출력 2.입력 3.수정 4.삭제 5.연봉인상(10%), 6.종료");
+		System.out.println("Books Menu(1.출력 2.입력 3.수정 4.삭제 5.책값인상 6.책값 조회 7.종료");
 		System.out.print(">>");
 	}
-	
+
 	private static void bookListPrint(ArrayList<Books> booksList) {
 		for (Books books : booksList) {
 			System.out.println(books.toString());
