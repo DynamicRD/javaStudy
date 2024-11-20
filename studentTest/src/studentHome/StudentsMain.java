@@ -1,18 +1,19 @@
 package studentHome;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import booktest.Books;
 import booktest.DBConnection;
 
 public class StudentsMain {
 	public static Scanner sc = new Scanner(System.in);
-	public static final int SELECT = 1, INSERT = 2, DELETE = 3, UPDATE = 4, EXIT = 5;
 
 	public static void main(String[] args) throws SQLException {
 		boolean exitFlag = false;
@@ -21,19 +22,25 @@ public class StudentsMain {
 			printMenu();
 			int choice = Integer.parseInt(sc.nextLine());
 			switch (choice) {
-			case SELECT:
-				studentSelect();
+			case StudentsMenu.PRINT:
+				studentPrint();
 				break;
-			case INSERT:
+			case StudentsMenu.INSERT:
 				studentInsert();
 				break;
-			case DELETE:
+			case StudentsMenu.DELETE:
 				studentDelete();
 				break;
-			case UPDATE:
+			case StudentsMenu.UPDATE:
 				studentUpdate();
 				break;
-			case EXIT:
+			case StudentsMenu.STUDENTS_PROC:
+				studentPassProc();
+				break;
+			case StudentsMenu.STUDENTS_FUNC:
+
+				break;
+			case StudentsMenu.EXIT:
 				exitFlag = true;
 				break;
 			default:
@@ -43,13 +50,37 @@ public class StudentsMain {
 		System.out.println("The end");
 	}
 
+	private static void studentPassProc() throws SQLException {
+		// Connection
+		Connection con = null;
+		CallableStatement cstmt = null;
+
+		// 1 Load,2 connect
+		con = DBConnection.dbCon();
+		System.out.print("통과여부를 확인할 ID 입력: >>");
+		int id = Integer.parseInt(sc.nextLine());
+		
+		cstmt = con.prepareCall("{call STUDENTS_PROCEDURE(?, ?)}");
+		cstmt.setInt(1, id);
+		cstmt.registerOutParameter(2, Types.VARCHAR);
+
+		int result = cstmt.executeUpdate();
+		String message = cstmt.getString(2);
+		System.out.println(message);
+		// 4.내용이 잘 입력이 되었는지 check
+		System.out.println((result != 0) ? "통과 프로시저성공" : "통과 인상 프로시저실패");
+		// 5.sql 객체 반납
+		DBConnection.dbClose(con, cstmt);
+	}
+
 	private static void studentUpdate() throws SQLException {
 		// Connection
 		Connection con = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 
 		// 1.Load,2.connect
 		con = DBConnection.dbCon();
+		con.setAutoCommit(false);
 		// 3.statement
 		// 수정할 데이터를 입력
 		boolean exitFlag = false;
@@ -96,26 +127,38 @@ public class StudentsMain {
 			exitFlag = true;
 		}
 		Students students = new Students(id, name, kor, eng, math);
-		stmt = con.createStatement();
-		int result = stmt.executeUpdate("UPDATE STUDENTS SET ID = " + id + ", NAME = '" + name + "',KOR =" + kor
-				+ ",ENG=" + eng + ",MATH=" + math + ",SUM="+(kor+eng+math)+",AVG="+(kor+eng+math)/3 +"WHERE ID = " + id);
+		pstmt = con.prepareStatement("UPDATE STUDENTS SET ID = ?, NAME = ?,KOR = ?,ENG= ?,MATH= ? WHERE ID = ?");
+		pstmt.setInt(1, students.getId());
+		pstmt.setString(2, students.getName());
+		pstmt.setInt(3, students.getKor());
+		pstmt.setInt(4, students.getEng());
+		pstmt.setInt(5, students.getMath());
+		pstmt.setInt(6, students.getId());
+
+		int result = pstmt.executeUpdate();
 		// 4.내용이 잘 입력되었는지 체크
 		System.out.println((result != 0) ? "수정성공" : "수정실패");
+		if (result != 0) {
+			con.commit();
+		} else {
+			con.rollback();
+		}
 		// 5.sql 객체 반납
-		DBConnection.dbClose(con, stmt);
+		DBConnection.dbClose(con, pstmt);
 	}
 
+	// 삭제
 	private static void studentDelete() throws SQLException {
 		// Connection
 		Connection con = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 		int id = 0;
 		boolean exitFlag = false;
 		// 1.Load,2.connect
 		con = DBConnection.dbCon();
+		con.setAutoCommit(false);
 		// 3.statement
-		while(!exitFlag)
-		{
+		while (!exitFlag) {
 			System.out.print("삭제할 번호를 입력하세요: ");
 			try {
 				id = Integer.parseInt(sc.nextLine());
@@ -126,21 +169,28 @@ public class StudentsMain {
 			}
 			exitFlag = true;
 		}
-		stmt = con.createStatement();
-		int result = stmt.executeUpdate("DELETE FROM STUDENTS WHERE ID = " + id);
+		pstmt = con.prepareStatement("DELETE FROM STUDENTS WHERE ID = ?");
+		pstmt.setInt(1, id);
+		int result = pstmt.executeUpdate();
 		// 4.내용이 잘 입력되었는지 체크
 		System.out.println((result != 0) ? "삭제성공" : "삭제실패");
+		if (result != 0) {
+			con.commit();
+		} else {
+			con.rollback();
+		}
 		// 5.sql 객체 반납
-		DBConnection.dbClose(con, stmt);
+		DBConnection.dbClose(con, pstmt);
 	}
 
 	private static void studentInsert() throws SQLException {
 		// Connection
 		Connection con = null;
-		Statement stmt = null;
+		PreparedStatement pstmt = null;
 
 		// 1.Load,2.connect
 		con = DBConnection.dbCon();
+		con.setAutoCommit(false);
 		// 3.statement
 		boolean exitFlag = false;
 		String name = null;
@@ -177,17 +227,28 @@ public class StudentsMain {
 			exitFlag = true;
 		}
 		Students students = new Students(0, name, kor, eng, math);
-		stmt = con.createStatement();
-		int result = stmt.executeUpdate(
-				"INSERT INTO STUDENTS VALUES(students_id_seq.nextval,'" + students.getName()
-						+ "'," + students.getKor() + "," + students.getEng() + "," + students.getMath() +","+students.getSum()+","+students.getAvg()+")");
+		pstmt = con.prepareStatement(
+				"INSERT INTO STUDENTS(ID,NAME,KOR,ENG,MATH,SUM,AVG) VALUES(students_id_seq.nextval,?,?,?,?,?,?)");
+		pstmt.setString(1, students.getName());
+		pstmt.setInt(2, students.getKor());
+		pstmt.setInt(3, students.getEng());
+		pstmt.setInt(4, students.getMath());
+		pstmt.setInt(5, students.getSum());
+		pstmt.setDouble(6, students.getAvg());
+		int result = pstmt.executeUpdate();
 		// 4.내용이 잘 입력되었는지 체크
 		System.out.println((result != 0) ? "입력성공" : "입력실패");
+
+		if (result != 0) {
+			con.commit();
+		} else {
+			con.rollback();
+		}
 		// 5.sql 객체 반납
-		DBConnection.dbClose(con, stmt);
+		DBConnection.dbClose(con, pstmt);
 	}
 
-	private static void studentSelect() throws SQLException {
+	private static void studentPrint() throws SQLException {
 		// Connection
 		Connection con = null;
 		Statement stmt = null;
@@ -223,7 +284,7 @@ public class StudentsMain {
 	}
 
 	private static void printMenu() {
-		System.out.println("1.출력 2.입력 3.삭제 4.수정 5.종료");
+		System.out.println("1.출력 2.입력 3.삭제 4.수정 5.통과여부 7.종료");
 		System.out.print(">>");
 	}
 

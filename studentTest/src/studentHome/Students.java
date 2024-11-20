@@ -10,6 +10,7 @@ public class Students {
 	 private int math;
 	 private int sum;
 	 private double avg;
+	 private String pass;
 	 
 	public Students(int id, String name, int kor, int eng, int math) {
 		super();
@@ -20,6 +21,7 @@ public class Students {
 		this.math = math;
 		this.sum = kor+eng+math;
 		this.avg = this.sum/3;
+		this.pass = "미정";
 	}
 
 	public int getId() {
@@ -95,8 +97,18 @@ public class Students {
 	@Override
 	public String toString() {
 		return "Students [id=" + id + ", name=" + name + ", kor=" + kor + ", eng=" + eng + ", math=" + math + ", sum="
-				+ sum + ", avg=" + avg + "]";
+				+ sum + ", avg=" + avg + ", pass=" + pass + "]";
 	}
+
+	public String getPass() {
+		return pass;
+	}
+
+	public void setPass(String pass) {
+		this.pass = pass;
+	}
+
+
 
 
 	
