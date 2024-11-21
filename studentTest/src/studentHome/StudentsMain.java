@@ -62,6 +62,7 @@ public class StudentsMain {
 		
 		cstmt = con.prepareCall("{call STUDENTS_PROCEDURE(?, ?)}");
 		cstmt.setInt(1, id);
+
 		cstmt.registerOutParameter(2, Types.VARCHAR);
 
 		int result = cstmt.executeUpdate();
