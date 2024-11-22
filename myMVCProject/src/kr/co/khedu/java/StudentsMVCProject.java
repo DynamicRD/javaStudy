@@ -16,7 +16,7 @@ import kr.co.khedu.java.model.StudentsVO;
 import kr.co.khedu.java.view.StudentsCURDMenu;
 import kr.co.khedu.java.view.StudentsMenu;
 
-public class StudentsMVCProject {
+public class StudentsMVCProject { 
 	public static Scanner sc = new Scanner(System.in);
 
 	public static void main(String[] args) throws SQLException {
@@ -39,9 +39,6 @@ public class StudentsMVCProject {
 				break;
 			case StudentsCURDMenu.STUDENTS_PROC:
 				StudentsRegisterManager.studentPassProc();
-				break;
-			case StudentsCURDMenu.STUDENTS_FUNC:
-
 				break;
 			case StudentsCURDMenu.EXIT:
 				exitFlag = true;

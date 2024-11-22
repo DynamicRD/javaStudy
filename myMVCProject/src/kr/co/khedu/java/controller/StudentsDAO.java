@@ -101,7 +101,6 @@ public class StudentsDAO {
 		pstmt.setInt(4, svo.getEng());
 		pstmt.setInt(5, svo.getMath());
 		pstmt.setInt(6, svo.getId());
-
 		int result = pstmt.executeUpdate();
 		// 4.내용이 잘 입력되었는지 체크
 		System.out.println((result != 0) ? "수정성공" : "수정실패");

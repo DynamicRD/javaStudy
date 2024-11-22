@@ -6,6 +6,5 @@ public interface StudentsCURDMenu {
 	int DELETE = 3;
 	int UPDATE= 4;
 	int STUDENTS_PROC = 5;
-	int STUDENTS_FUNC = 6;
-	int EXIT = 7;
+	int EXIT = 6;
 }

@@ -20,8 +20,9 @@ public class StudentsRegisterManager {
 	}
 
 	public static void printStudentsList(ArrayList<StudentsVO> studentsList) {
-		for (StudentsVO sv : studentsList) {
-			System.out.println(sv.toString());
+		 	System.out.println(String.format("%-4s%-4.9s%-5s%-4s%-5s%-4s%-4s%-4s","학번","이름","국어","영어","수학","총합","평균","통과여부"));
+		for (StudentsVO svo : studentsList) {
+			 System.out.println(String.format("%-5d%-5s%-5d%-5d%-5d%-5d%-5.1f%-5s",svo.getId(),svo.getName(),svo.getKor(),svo.getEng(),svo.getMath(),svo.getSum(),svo.getAvg(),svo.getPass()));
 		}
 
 	}
