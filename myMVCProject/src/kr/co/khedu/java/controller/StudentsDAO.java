@@ -18,7 +18,6 @@ public class StudentsDAO {
 	public static String insertSQL = "INSERT INTO STUDENTS(ID,NAME,KOR,ENG,MATH,SUM,AVG) VALUES(students_id_seq.nextval,?,?,?,?,?,?)";
 	public static String deleteSQL = "DELETE FROM STUDENTS WHERE ID = ?";
 	public static String updateSQL = "UPDATE STUDENTS SET ID = ?, NAME = ?,KOR = ?,ENG= ?,MATH= ? WHERE ID = ?";
-	public static String passProcSQL = "{call STUDENTS_PROCEDURE(?, ?)}";
 	
 	public static ArrayList<StudentsVO> selectSQL() throws SQLException {
 		// Connection
@@ -108,25 +107,5 @@ public class StudentsDAO {
 		DBUtility.dbClose(con, pstmt);
 		return result != 0;
 	}
-	public static boolean studentsPassProc(StudentsVO svo) throws SQLException {
-		// Connection
-		Connection con = null;
-		CallableStatement cstmt = null;
-
-		// 1 Load,2 connect
-		con = DBUtility.dbCon();
-		
-		cstmt = con.prepareCall(passProcSQL);
-		cstmt.setInt(1, svo.getId());
-		cstmt.registerOutParameter(2, Types.VARCHAR);
-
-		int result = cstmt.executeUpdate();
-		String message = cstmt.getString(2);
-		System.out.println(message);
-		// 4.내용이 잘 입력이 되었는지 check
-		System.out.println((result != 0) ? "통과 프로시저성공" : "통과 인상 프로시저실패");
-		// 5.sql 객체 반납
-		DBUtility.dbClose(con, cstmt);
-		return result != 0;
-	}
+	
 }

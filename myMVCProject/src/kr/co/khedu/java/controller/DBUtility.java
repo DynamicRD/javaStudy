@@ -20,7 +20,7 @@ public class DBUtility {
 			}
 		//2. connection
 		try {
-				con = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1521/xe","HR","hr");
+				con = DriverManager.getConnection("jdbc:oracle:thin:@127.0.0.1:1522/xe","HR","hr");
 			} catch (SQLException e) {
 				System.out.println(e.toString());
 			}
