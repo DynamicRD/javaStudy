@@ -20,11 +20,11 @@ public class MovieMain {
 				MenuViewer.mainMenuView();
 				no = Integer.parseInt(sc.nextLine()); 
 				switch (no) {
-				case MenuChoice.MOVIE:
-					movieMenu();
-					break;
 				case MenuChoice.CINAMA:
 					cinemaMenu();
+					break;
+				case MenuChoice.MOVIE:
+					movieMenu();
 					break;
 				case MenuChoice.AUDIENCE:
 					audienceMenu();

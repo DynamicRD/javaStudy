@@ -24,7 +24,7 @@ public class CinemaRegisterManager {
 		CinemaVO svo = new CinemaVO();
 
 		System.out.println("영화관 정보 입력");
-		System.out.print("이름 >>");
+		System.out.print("이름 : ");
 		String name = sc.nextLine();
 
 		System.out.print("지역 : ");
