@@ -22,6 +22,7 @@ public class ShopDAO {
 			con = DBUtility.dbCon();
 			pstmt = con.prepareStatement(SELECTSQL);
 			rs = pstmt.executeQuery();
+			System.out.println("=============================");
 			System.out.println("결재번호\t메뉴번호\t수입");
 			while (rs.next()) {
 				svo = new ShopVO();

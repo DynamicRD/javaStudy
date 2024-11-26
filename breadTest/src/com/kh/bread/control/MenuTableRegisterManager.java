@@ -20,6 +20,7 @@ public class MenuTableRegisterManager {
 		MenuTableVO mtvo = new MenuTableVO();
 		String name = null; 
 		int price = 0;
+		int amount = 0;
 		System.out.println("메뉴 전체 리스트");
 		mtdao.selectMenuTable();
 		System.out.println();
@@ -28,8 +29,11 @@ public class MenuTableRegisterManager {
 		name = input.nextLine();
 		System.out.print("메뉴 가격 : ");
 		price = Integer.parseInt(input.nextLine());
+		System.out.print("메뉴 재고 : ");
+		amount = Integer.parseInt(input.nextLine());
 		mtvo.setName(name);
 		mtvo.setPrice(price);
+		mtvo.setAmount(amount);
 		mtdao.insertMenuTable(mtvo);
 		System.out.println();
 		System.out.println("메뉴 전체 리스트");
@@ -46,11 +50,12 @@ public class MenuTableRegisterManager {
 		int bNo = 0;
 		String name = null; 
 		int price = 0;
+		int amount = 0;
 		System.out.println("메뉴 전체 리스트");
 		mtdao.selectMenuTable();
 		System.out.println();
 		System.out.println("수정할 메뉴 일련번호 입력");
-		System.out.print("일련번호 : ");
+		System.out.print("메뉴 번호 : ");
 		bNo = input1.nextInt();
 		System.out.println();
 		System.out.println("새로운 정보 모두 입력");
@@ -58,9 +63,12 @@ public class MenuTableRegisterManager {
 		name = input.nextLine();
 		System.out.print("메뉴 가격 : ");
 		price = Integer.parseInt(input.nextLine());
+		System.out.print("메뉴 재고 : ");
+		amount = Integer.parseInt(input.nextLine());
 		mtvo.setbNo(bNo);
 		mtvo.setName(name);
 		mtvo.setPrice(price);
+		mtvo.setAmount(amount);
 		mtdao.updateMenuTable(mtvo);
 		System.out.println();
 		System.out.println("메뉴 전체 리스트");
@@ -77,8 +85,8 @@ public class MenuTableRegisterManager {
 		System.out.println("메뉴 전체 리스트");
 		mtdao.selectMenuTable();
 		System.out.println();
-		System.out.println("삭제할 메뉴 일련번호 입력");
-		System.out.print("일련번호 : ");
+		System.out.println("삭제할 메뉴의 메뉴 번호 입력");
+		System.out.print("메뉴 번호 : ");
 		bNo = input.nextInt();
 		mtdao.deleteMenuTable(bNo);
 		System.out.println();

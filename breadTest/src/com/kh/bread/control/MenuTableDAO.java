@@ -9,8 +9,8 @@ import com.kh.bread.model.MenuTableVO;
 
 public class MenuTableDAO {
 	public static String SELECTSQL = "select * from MENUTABLE order by b_NO";
-	public static String INSERTSQL = "insert into MENUTABLE values (MENUTABLE_B_NO_SEQ.nextval, ?, ?)";
-	public static String UPDATESQL = "update MENUTABLE set NAME=?, PRICE=? where B_NO=?";
+	public static String INSERTSQL = "insert into MENUTABLE values (MENUTABLE_B_NO_SEQ.nextval, ?, ?, ?)";
+	public static String UPDATESQL = "update MENUTABLE set NAME=?, PRICE=?, AMOUNT=? where B_NO=?";
 	public static String DELETESQL = "delete from MENUTABLE where B_NO = ?";
 
 	// 메뉴 목록
@@ -24,16 +24,16 @@ public class MenuTableDAO {
 			con = DBUtility.dbCon();
 			pstmt = con.prepareStatement(SELECTSQL);
 			rs = pstmt.executeQuery();
-			System.out.println("메뉴번호\t메뉴명\t가격");
+			System.out.println("=============================");
+			System.out.println("메뉴번호\t메뉴명\t가격\t재고");
 			while (rs.next()) {
 				mtvo = new MenuTableVO();
 				mtvo.setbNo(rs.getInt("B_NO"));
 				mtvo.setName(rs.getString("NAME"));
 				mtvo.setPrice(rs.getInt("PRICE"));
+				mtvo.setAmount(rs.getInt("AMOUNT"));
 			
-				System.out.println(
-						mtvo.getbNo() + "\t" + mtvo.getName() + "\t" + mtvo.getPrice());
-
+				System.out.println(mtvo.getbNo() + "\t" + mtvo.getName() + "\t" + mtvo.getPrice()+"\t"+mtvo.getAmount());
 			}
 		} catch (SQLException se) {
 			System.out.println(se);
@@ -62,10 +62,10 @@ public class MenuTableDAO {
 			pstmt = con.prepareStatement(INSERTSQL);
 			pstmt.setString(1, mtvo.getName()); //
 			pstmt.setInt(2, mtvo.getPrice()); //
+			pstmt.setInt(3, mtvo.getAmount()); //
 			int result = pstmt.executeUpdate(); //
 			if (result == 1) {
-				System.out.println(mtvo.getName() + " 메뉴 등록 완료.");
-				System.out.println("메뉴 등록 성공");
+				System.out.println(mtvo.getName() + " 메뉴 등록 성공.");
 			} else {
 				System.out.println("메뉴 등록 실패");
 			}
@@ -75,7 +75,6 @@ public class MenuTableDAO {
 			System.out.println("e=[" + e + "]");
 		} finally {
 			try {
-				// 데이터베이스와의 연결에 사용되었던 오브젝트를 해제
 				if (pstmt != null)
 					pstmt.close();
 
@@ -96,11 +95,11 @@ public class MenuTableDAO {
 			pstmt = con.prepareStatement(UPDATESQL);
 			pstmt.setString(1, mtvo.getName()); //
 			pstmt.setInt(2, mtvo.getPrice()); //
-			pstmt.setInt(3, mtvo.getbNo());
+			pstmt.setInt(3, mtvo.getAmount()); //
+			pstmt.setInt(4, mtvo.getbNo());
 			int result = pstmt.executeUpdate();
 			if (result == 1) {
-				System.out.println(mtvo.getName() + " 메뉴 수정 완료.");
-				System.out.println("메뉴 수정 성공");
+				System.out.println(mtvo.getName() + " 메뉴 수정 성공.");
 			} else {
 				System.out.println("메뉴 수정 실패");
 			}
@@ -110,7 +109,6 @@ public class MenuTableDAO {
 			System.out.println("e=[" + e + "]");
 		} finally {
 			try {
-				// 데이터베이스와의 연결에 사용되었던 오브젝트를 해제
 				if (pstmt != null)
 					pstmt.close();
 				if (con != null)
@@ -133,7 +131,6 @@ public class MenuTableDAO {
 			pstmt.setInt(1, no);
 			int result = pstmt.executeUpdate();
 			if (result == 1) {
-				System.out.println("메뉴 삭제 완료.");
 				System.out.println("메뉴 삭제 성공");
 			} else {
 				System.out.println("메뉴 삭제 실패");
@@ -144,7 +141,6 @@ public class MenuTableDAO {
 			System.out.println("e=[" + e + "]");
 		} finally {
 			try {
-				// 데이터베이스와의 연결에 사용되었던 오브젝트를 해제
 				if (pstmt != null)
 					pstmt.close();
 				if (con != null)

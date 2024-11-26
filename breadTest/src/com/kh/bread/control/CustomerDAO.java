@@ -26,6 +26,7 @@ public class CustomerDAO {
 			con = DBUtility.dbCon();
 			pstmt = con.prepareStatement(SELECTSQL);
 			rs = pstmt.executeQuery();
+			System.out.println("=============================");
 			System.out.println("고객번호\t고객명\t메뉴번호\t구매량");
 			while (rs.next()) {
 				cvo = new CustomerVO();

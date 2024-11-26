@@ -16,7 +16,7 @@ public class DBUtility {
 	public static Connection dbCon()  {
 		Connection con = null;
 		// 1. db.properties file( id, pw, url setting)
-		String filePath = "D:\\Study_KH\\JavaStudy\\breadTest\\src\\db.properties";
+		String filePath = "D:\\JavaStudy\\breadTest\\src\\db.properties";
 		Properties pt = new Properties(); 
 		try {
 			pt.load(new FileReader(filePath));
